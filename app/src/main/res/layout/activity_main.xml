@@ -17,5 +17,6 @@
         android:id="@+id/button"
         android:background="@drawable/round_button"
         android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:onClick="buttonPress" />
 </RelativeLayout>
