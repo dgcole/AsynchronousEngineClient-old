@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Asynchronous Engine Client</string>
+    <string name="buttonText">Test Connection</string>
+</resources>
