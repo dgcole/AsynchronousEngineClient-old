@@ -14,6 +14,6 @@ public class main extends AppCompatActivity
     }
 
     public void buttonPress (View v) {
-        //System.out.println("The button was pressed.");
+        System.out.println("The button was pressed.");
     }
 }
