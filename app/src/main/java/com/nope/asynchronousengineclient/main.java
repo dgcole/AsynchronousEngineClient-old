@@ -24,20 +24,6 @@ public class main extends AppCompatActivity
     }
 
     public void buttonPress (View v) {
-        String word = "HANDSHAKE";
-        try {
-            Socket clientSocket = new Socket();
-            clientSocket.connect(new InetSocketAddress("172.21.38.107", 6789), 10000);
-
-            DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
-            BufferedReader inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-            outToServer.writeBytes(word);
-            if (inFromServer.toString().toUpperCase().equals(word)) {
-                Log.d("Result", "Success");
-            }
-
-        } catch (Exception E) {
-            Log.d("Something bad happened.", E.toString());
-        }
+        new TCPClient().execute("handshake", "172.21.19.26", "6789");
     }
 }
