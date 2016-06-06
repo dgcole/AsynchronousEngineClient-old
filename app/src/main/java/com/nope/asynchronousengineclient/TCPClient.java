@@ -1,11 +1,12 @@
 package com.nope.asynchronousengineclient;
 
 import android.os.AsyncTask;
-import android.provider.Settings;
-import android.support.v7.app.AppCompatActivity;
-import android.telephony.TelephonyManager;
-import android.view.View;
 import android.widget.TextView;
+
+import org.python.core.PyObject;
+import org.python.core.PyType;
+import org.python.util.PythonInterpreter;
+
 
 import java.io.*;
 import java.net.InetSocketAddress;
@@ -17,13 +18,15 @@ public class TCPClient extends AsyncTask<String, Integer, Boolean> {
 
     TextView view;
     String out;
+    File dir;
     int lowerBound;
     int upperBound;
     int fileLength;
 
-    public TCPClient(TextView v) {
+    public TCPClient(TextView v, File f) {
         super();
         view = v;
+        dir = f;
     }
 
     protected ArrayList<String> getServerAddress() {
@@ -79,19 +82,20 @@ public class TCPClient extends AsyncTask<String, Integer, Boolean> {
             System.out.println(lowerBound + " to " + upperBound);
             System.out.println("File Length: " + fileLength);
 
-            FileOutputStream fos = new FileOutputStream(//TODO; file?);
-            byte[] buffer = new byte[4096];
 
-            int read = 0;
-            int totalRead = 0;
-            int remaining = fileLength;
-            while((read = dis.read(buffer, 0, Math.min(buffer.length, remaining))) > 0) {
-                totalRead += read;
-                remaining -= read;
-                System.out.println("Read: " + totalRead + " bytes.");
-                fos.write(buffer, 0, read);
+            File outFile = new File(dir, "AsynchronousEngine/program.py");
+            FileOutputStream fos = new FileOutputStream(outFile);
+
+            byte[] buffer = new byte[fileLength];
+            for(int i = 0; i < fileLength; i++) {
+                String temp = inFromServer.readLine();
+                byte data = Byte.parseByte(temp);
+                fos.write(data);
             }
 
+            System.out.println("Done reading.");
+            fos.close();
+            runProgram(outFile);
         } catch (Exception E) {
             E.printStackTrace();
             return false;
@@ -99,6 +103,25 @@ public class TCPClient extends AsyncTask<String, Integer, Boolean> {
         return success;
     }
 
+    protected void runProgram(File f) throws IOException {
+        String pythonFilePath = f.getPath();
+        PythonInterpreter interp;
+        BufferedReader terminal = new BufferedReader(new InputStreamReader(System.in));
+        System.out.println("hello");
+        interp = new PythonInterpreter();
+
+        ArrayList<String> pyCode = new ArrayList<>();
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(f));
+            String line;
+            while(!(line = br.readLine()).isEmpty()) {
+                pyCode.add(line);
+                System.out.println(line);
+            }
+        } catch (Exception E){
+
+        }
+    }
     @Override
     protected void onPreExecute() {
         view.setText("Attempting to connect.");
