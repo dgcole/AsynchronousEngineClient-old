@@ -1,12 +1,9 @@
 package com.nope.asynchronousengineclient;
 
 import android.os.AsyncTask;
+import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
-
-import org.python.core.PyObject;
-import org.python.core.PyType;
-import org.python.util.PythonInterpreter;
-
+import android.widget.Toast;
 
 import java.io.*;
 import java.net.InetSocketAddress;
@@ -16,17 +13,17 @@ import java.util.ArrayList;
 
 public class TCPClient extends AsyncTask<String, Integer, Boolean> {
 
-    TextView view;
     String out;
     File dir;
     int lowerBound;
     int upperBound;
     int fileLength;
+    AppCompatActivity appMain;
 
-    public TCPClient(TextView v, File f) {
+    public TCPClient(File f, main m) {
         super();
-        view = v;
         dir = f;
+        appMain = m;
     }
 
     protected ArrayList<String> getServerAddress() {
@@ -78,24 +75,16 @@ public class TCPClient extends AsyncTask<String, Integer, Boolean> {
             }
             lowerBound = Integer.parseInt(inFromServer.readLine());
             upperBound = Integer.parseInt(inFromServer.readLine());
-            fileLength = Integer.parseInt(inFromServer.readLine());
-            System.out.println(lowerBound + " to " + upperBound);
-            System.out.println("File Length: " + fileLength);
+            System.out.println("Range is from " + lowerBound + " to " + upperBound + ".");
 
+            ArrayList<Integer> primes = new primeCalculator(lowerBound, upperBound).calculate();
+            primes.add(-1);
+            System.out.println("Done with primes.");
 
-            File outFile = new File(dir, "AsynchronousEngine/program.py");
-            FileOutputStream fos = new FileOutputStream(outFile);
-
-            byte[] buffer = new byte[fileLength];
-            for(int i = 0; i < fileLength; i++) {
-                String temp = inFromServer.readLine();
-                byte data = Byte.parseByte(temp);
-                fos.write(data);
+            for (Integer i : primes) {
+                System.out.println("Prime: " + i);
+                outToServer.writeBytes(i.toString() + "\n");
             }
-
-            System.out.println("Done reading.");
-            fos.close();
-            runProgram(outFile);
         } catch (Exception E) {
             E.printStackTrace();
             return false;
@@ -103,37 +92,27 @@ public class TCPClient extends AsyncTask<String, Integer, Boolean> {
         return success;
     }
 
-    protected void runProgram(File f) throws IOException {
-        String pythonFilePath = f.getPath();
-        PythonInterpreter interp;
-        BufferedReader terminal = new BufferedReader(new InputStreamReader(System.in));
-        System.out.println("hello");
-        interp = new PythonInterpreter();
-
-        ArrayList<String> pyCode = new ArrayList<>();
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(f));
-            String line;
-            while(!(line = br.readLine()).isEmpty()) {
-                pyCode.add(line);
-                System.out.println(line);
-            }
-        } catch (Exception E){
-
-        }
-    }
     @Override
     protected void onPreExecute() {
-        view.setText("Attempting to connect.");
+        showToast("Attempting to connect.", Toast.LENGTH_SHORT);
     }
 
     @Override
     protected void onPostExecute(Boolean aBoolean) {
         super.onPostExecute(aBoolean);
         if (out == null) {
-            view.setText("Failed to connect.");
+            showToast("Failed to connect.", Toast.LENGTH_LONG);
         } else {
-            view.setText("From Server: " + out);
+            showToast("From Server: " + out, Toast.LENGTH_SHORT);
         }
+    }
+
+    protected void showToast(final String s, final int l) {
+        appMain.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(appMain, s, l).show();
+            }
+        });
     }
 }
