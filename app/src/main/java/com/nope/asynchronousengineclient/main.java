@@ -1,6 +1,7 @@
 package com.nope.asynchronousengineclient;
 
 import android.os.Environment;
+import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -17,7 +18,8 @@ public class main extends AppCompatActivity
     }
 
     public void buttonPress (View v) throws Exception {
-        new TCPClient(Environment.getExternalStorageDirectory(), this).execute("handshake");
+        String androidId = Settings.Secure.getString(getApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID);
+        new TCPClient(Environment.getExternalStorageDirectory(), this, androidId).execute("handshake");
     }
 
 

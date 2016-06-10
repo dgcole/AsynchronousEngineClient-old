@@ -19,11 +19,13 @@ public class TCPClient extends AsyncTask<String, Integer, Boolean> {
     int upperBound;
     int fileLength;
     AppCompatActivity appMain;
+    String androidId;
 
-    public TCPClient(File f, main m) {
+    public TCPClient(File f, main m, String id) {
         super();
         dir = f;
         appMain = m;
+        androidId = id;
     }
 
     protected ArrayList<String> getServerAddress() {
@@ -65,7 +67,7 @@ public class TCPClient extends AsyncTask<String, Integer, Boolean> {
             DataInputStream dis = new DataInputStream(clientSocket.getInputStream());
 
             //TODO; Add id
-            outToServer.writeBytes("insertidlater\n");
+            outToServer.writeBytes(androidId + "\n");
             outToServer.writeBytes(word + '\n');
             out = inFromServer.readLine();
             if (word.toUpperCase().equals(out)) {
