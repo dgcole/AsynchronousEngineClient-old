@@ -18,6 +18,7 @@ public class main extends AppCompatActivity
     }
 
     public void buttonPress (View v) throws Exception {
+        //Starts a new thread which connects to the server and does things when button is pressed.
         String androidId = Settings.Secure.getString(getApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID);
         new TCPClient(Environment.getExternalStorageDirectory(), this, androidId).execute("handshake");
     }

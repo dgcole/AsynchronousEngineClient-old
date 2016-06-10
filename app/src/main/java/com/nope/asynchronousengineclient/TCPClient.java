@@ -29,6 +29,7 @@ public class TCPClient extends AsyncTask<String, Integer, Boolean> {
     }
 
     protected ArrayList<String> getServerAddress() {
+        //This function gets the current server address from my webserver.
         ArrayList<String> details = new ArrayList<>();
         try {
             URL infourl = new URL("http://www.expert700.me/serverinfo.php/");
@@ -58,6 +59,7 @@ public class TCPClient extends AsyncTask<String, Integer, Boolean> {
         System.out.println("IP: " + ip);
         System.out.println("Port: " + port);
         try {
+            //Starts the connection.
             Socket clientSocket = new Socket();
             System.out.println("Attempting to connect.");
             clientSocket.connect(new InetSocketAddress(ip, port), 10000);
@@ -66,7 +68,7 @@ public class TCPClient extends AsyncTask<String, Integer, Boolean> {
             BufferedReader inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             DataInputStream dis = new DataInputStream(clientSocket.getInputStream());
 
-            //TODO; Add id
+            //Sends id to the server and makes sure it's connected.
             outToServer.writeBytes(androidId + "\n");
             outToServer.writeBytes(word + '\n');
             out = inFromServer.readLine();
@@ -75,10 +77,12 @@ public class TCPClient extends AsyncTask<String, Integer, Boolean> {
 
                 success = true;
             }
+            //Gets the range to calculate primes in from the server.
             lowerBound = Integer.parseInt(inFromServer.readLine());
             upperBound = Integer.parseInt(inFromServer.readLine());
             System.out.println("Range is from " + lowerBound + " to " + upperBound + ".");
 
+            //Calculates primes and sends them back to the server.
             ArrayList<Integer> primes = new primeCalculator(lowerBound, upperBound).calculate();
             primes.add(-1);
             System.out.println("Done with primes.");
@@ -110,6 +114,7 @@ public class TCPClient extends AsyncTask<String, Integer, Boolean> {
     }
 
     protected void showToast(final String s, final int l) {
+        //This just shows a Toast through the UI thread.
         appMain.runOnUiThread(new Runnable() {
             @Override
             public void run() {
